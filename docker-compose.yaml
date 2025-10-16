@@ -50,18 +50,20 @@ x-airflow-common:
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.1.0}
+    # user: "${AIRFLOW_UID:-50000}:0"
+  env_file: [.env]
   # build: .
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
-    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
-    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
-    AIRFLOW__CORE__FERNET_KEY: ''
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
-    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
+    # AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${DB_CONN}
+    AIRFLOW__CELERY__RESULT_BACKEND: ${RESULT_BACKEND}
+    AIRFLOW__CELERY__BROKER_URL: ${BROKER_URL}
+    # AIRFLOW__CORE__FERNET_KEY: ''
+    # AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    # AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    # AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
@@ -69,15 +71,14 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    _PIP_ADDITIONAL_REQUIREMENTS: ""
     # The following line can be used to set a custom config file, stored in the local config folder
-    AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    # AIRFLOW_CONFIG: ${CONFIG_PATH}
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}:0"
+    - ${AIRFLOW_PROJ_DIR}/dags:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR}/logs:/opt/airflow/logs
+    - ${AIRFLOW_PROJ_DIR}/config:/opt/airflow/config
+    - ${AIRFLOW_PROJ_DIR}/plugins:/opt/airflow/plugins
   depends_on:
     &airflow-common-depends-on
     redis:
@@ -115,6 +116,35 @@ services:
       start_period: 30s
     restart: always
 
+  # ---------- git-sync (v4; registry.k8s.io) ----------
+  git-sync:
+    image: registry.k8s.io/git-sync/git-sync:v4.5.0
+    restart: unless-stopped
+    environment:
+      GIT_SYNC_REPO: ${GIT_SYNC_REPO}
+      GIT_SYNC_BRANCH: ${GIT_SYNC_BRANCH}
+      GIT_SYNC_ROOT: ${GIT_SYNC_ROOT}
+      GIT_SYNC_DEST: ${GIT_SYNC_DEST}
+      GIT_SYNC_WAIT: ${GIT_SYNC_WAIT}
+      GIT_SYNC_ADD_USER: "true"
+      # Use SSH with strict host key checking and pinned known_hosts
+      GIT_SYNC_SSH: "true"
+      GIT_SYNC_SSH_KEY_FILE: /etc/git-secret/ssh
+      GIT_SSH_COMMAND: >-
+        ssh -o StrictHostKeyChecking=yes
+            -o UserKnownHostsFile=/etc/git-secret/known_hosts
+            -i /etc/git-secret/ssh
+    volumes:
+      - git-dags:/tmp/git
+      - ./ssh-secret/airflow_git_sync:/etc/git-secret/ssh:ro
+      - /etc/ssh/ssh_known_hosts:/etc/git-secret/known_hosts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "test -d /tmp/git/${GIT_SYNC_DEST}"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  # ---------- Airflow ----------
   airflow-apiserver:
     <<: *airflow-common
     command: api-server
@@ -131,6 +161,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+      git-sync:
+        condition: service_started
 
   airflow-scheduler:
     <<: *airflow-common
@@ -146,6 +178,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+      git-sync:
+        condition: service_started
 
   airflow-dag-processor:
     <<: *airflow-common
@@ -161,6 +195,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+      git-sync:
+        condition: service_started
 
   airflow-worker:
     <<: *airflow-common
@@ -201,6 +237,8 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+      git-sync:
+        condition: service_started
 
   airflow-init:
     <<: *airflow-common
@@ -332,4 +370,5 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  postgres-db-volume:
+  pgdata:
+  git-dags:
