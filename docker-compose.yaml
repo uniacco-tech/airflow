@@ -121,12 +121,12 @@ services:
     image: registry.k8s.io/git-sync/git-sync:v4.5.0
     restart: unless-stopped
     environment:
-      GIT_SYNC_REPO: ${GIT_SYNC_REPO}
-      GIT_SYNC_BRANCH: ${GIT_SYNC_BRANCH}
-      GIT_SYNC_ROOT: ${GIT_SYNC_ROOT}
-      GIT_SYNC_DEST: ${GIT_SYNC_DEST}
-      GIT_SYNC_WAIT: ${GIT_SYNC_WAIT}
-      GIT_SYNC_ADD_USER: "true"
+      GITSYNC_REPO: ${GIT_SYNC_REPO}
+      GITSYNC_BRANCH: ${GIT_SYNC_BRANCH}
+      GITSYNC_ROOT: ${GIT_SYNC_ROOT}
+      GITSYNC_DEST: ${GIT_SYNC_DEST}
+      GITSYNC_WAIT: ${GIT_SYNC_WAIT}
+      GITSYNC_ADD_USER: "true"
       # Use SSH with strict host key checking and pinned known_hosts
       GIT_SYNC_SSH: "true"
       GIT_SYNC_SSH_KEY_FILE: /etc/git-secret/ssh
