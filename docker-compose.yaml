@@ -121,28 +121,30 @@ services:
     image: registry.k8s.io/git-sync/git-sync:v4.5.0
     restart: unless-stopped
     environment:
+      # Core settings
       GITSYNC_REPO: ${GIT_SYNC_REPO}
-      GITSYNC_BRANCH: ${GIT_SYNC_BRANCH}
+      GITSYNC_REF: ${GIT_SYNC_BRANCH}
       GITSYNC_ROOT: ${GIT_SYNC_ROOT}
-      GITSYNC_DEST: ${GIT_SYNC_DEST}
-      GITSYNC_WAIT: ${GIT_SYNC_WAIT}
+      GITSYNC_LINK: ${GIT_SYNC_DEST}
+      GITSYNC_PERIOD: ${GIT_SYNC_PERIOD}
       GITSYNC_ADD_USER: "true"
-      # Use SSH with strict host key checking and pinned known_hosts
-      GIT_SYNC_SSH: "true"
-      GIT_SYNC_SSH_KEY_FILE: /etc/git-secret/ssh
-      GIT_SSH_COMMAND: >-
-        ssh -o StrictHostKeyChecking=yes
-            -o UserKnownHostsFile=/etc/git-secret/known_hosts
-            -i /etc/git-secret/ssh
+      # SSH settings
+      GITSYNC_SSH: "true"
+      GITSYNC_SSH_KEY_FILE: ${GIT_SYNC_SSH_KEY_FILE}
+      GITSYNC_SSH_KNOWN_HOSTS: "true"
+      GITSYNC_SSH_KNOWN_HOSTS_FILE: ${GIT_SYNC_SSH_KNOWN_HOSTS_FILE}
     volumes:
-      - git-dags:/tmp/git
+      - git-dags:/git
       - ./ssh-secret/airflow_git_sync:/etc/git-secret/ssh:ro
       - /etc/ssh/ssh_known_hosts:/etc/git-secret/known_hosts:ro
+    # Optional: security context (recommended for production)
+    # user: "65533:65533"  # git-sync user
     healthcheck:
-      test: ["CMD-SHELL", "test -d /tmp/git/${GIT_SYNC_DEST}"]
+      test: ["CMD-SHELL", "test -d ${GIT_SYNC_ROOT}/${GIT_SYNC_DEST}"]
       interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 10s
 
   # ---------- Airflow ----------
   airflow-apiserver:
