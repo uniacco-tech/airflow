@@ -370,5 +370,5 @@ services:
         condition: service_completed_successfully
 
 volumes:
-  pgdata:
+  postgres-db-volume:
   git-dags:
