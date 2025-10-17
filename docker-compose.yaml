@@ -75,7 +75,7 @@ x-airflow-common:
     # The following line can be used to set a custom config file, stored in the local config folder
     # AIRFLOW_CONFIG: ${CONFIG_PATH}
   volumes:
-    - ${AIRFLOW_PROJ_DIR}/dags:/opt/airflow/dags
+    - airflow_git-dags:/opt/airflow/dags:ro
     - ${AIRFLOW_PROJ_DIR}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR}/plugins:/opt/airflow/plugins
@@ -134,8 +134,6 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-      git-sync:
-        condition: service_started
 
   airflow-scheduler:
     <<: *airflow-common
@@ -151,8 +149,6 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-      git-sync:
-        condition: service_started
 
   airflow-dag-processor:
     <<: *airflow-common
@@ -168,8 +164,6 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-      git-sync:
-        condition: service_started
 
   airflow-worker:
     <<: *airflow-common
@@ -210,8 +204,6 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
-      git-sync:
-        condition: service_started
 
   airflow-init:
     <<: *airflow-common
@@ -344,4 +336,5 @@ services:
 
 volumes:
   postgres-db-volume:
-  git-dags:
+  airflow_git-dags:
+    external: true
