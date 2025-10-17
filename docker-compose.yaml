@@ -136,7 +136,7 @@ services:
     volumes:
       - git-dags:/git
       - ./ssh-secret/airflow_git_sync:/etc/git-secret/ssh:ro
-      - /etc/ssh/ssh_known_hosts:/etc/git-secret/known_hosts:ro
+      - ./ssh-secret/known_hosts:/etc/git-secret/known_hosts:ro   # <- use local known_hosts, not /etc/ssh/ssh_known_hosts
     # Optional: security context (recommended for production)
     # user: "65533:65533"  # git-sync user
     healthcheck:
