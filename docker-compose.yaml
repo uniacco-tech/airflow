@@ -116,36 +116,6 @@ services:
       start_period: 30s
     restart: always
 
-  # ---------- git-sync (v4; registry.k8s.io) ----------
-  git-sync:
-    image: registry.k8s.io/git-sync/git-sync:v4.5.0
-    restart: unless-stopped
-    environment:
-      # Core settings
-      GITSYNC_REPO: ${GIT_SYNC_REPO}
-      GITSYNC_REF: ${GIT_SYNC_BRANCH}
-      GITSYNC_ROOT: ${GIT_SYNC_ROOT}
-      GITSYNC_LINK: ${GIT_SYNC_DEST}
-      GITSYNC_PERIOD: ${GIT_SYNC_PERIOD}
-      GITSYNC_ADD_USER: "true"
-      # SSH settings
-      GITSYNC_SSH: "true"
-      GITSYNC_SSH_KEY_FILE: ${GIT_SYNC_SSH_KEY_FILE}
-      GITSYNC_SSH_KNOWN_HOSTS: "true"
-      GITSYNC_SSH_KNOWN_HOSTS_FILE: ${GIT_SYNC_SSH_KNOWN_HOSTS_FILE}
-    volumes:
-      - git-dags:/git
-      - ./ssh-secret/airflow_git_sync:/etc/git-secret/ssh:ro
-      - ./ssh-secret/known_hosts:/etc/git-secret/known_hosts:ro   # <- use local known_hosts, not /etc/ssh/ssh_known_hosts
-    # Optional: security context (recommended for production)
-    # user: "65533:65533"  # git-sync user
-    healthcheck:
-      test: ["CMD-SHELL", "test -d ${GIT_SYNC_ROOT}/${GIT_SYNC_DEST}"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-
   # ---------- Airflow ----------
 
   airflow-apiserver:
