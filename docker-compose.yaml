@@ -6,7 +6,7 @@ x-airflow-common: &airflow-common
   env_file:
     - .env
   environment: &airflow-common-env
-    # Executor (pull from .env or fallback)
+    # Executor (pull from .env)
     AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
 
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${DB_CONN}
