@@ -8,7 +8,7 @@ x-airflow-common: &airflow-common
   environment: &airflow-common-env
     # Executor (pull from .env or fallback)
     AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
-    # --- critical explicit mappings so airflow doesn't fallback to sqlite ----
+
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${DB_CONN}
     AIRFLOW__CELERY__RESULT_BACKEND: ${RESULT_BACKEND}
     AIRFLOW__CELERY__BROKER_URL: ${BROKER_URL}
