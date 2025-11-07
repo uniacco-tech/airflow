@@ -12,5 +12,5 @@ with DAG(
 
     hello = BashOperator(
         task_id="hello",
-        bash_command='echo "hello from pilot_test_dag ($(hostname))"',
+        bash_command='echo "hello from the pilot_test_dag ($(hostname))"',
     )
