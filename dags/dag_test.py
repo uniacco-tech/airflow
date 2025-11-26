@@ -62,11 +62,6 @@ with DAG(
     tags=["Redshift", "ETL"]
 ) as dag:
 
-    start = BashOperator(
-        task_id="start_log",
-        bash_command='echo "Starting ETL refresh..."'
-    )
-
     run_etl = PythonOperator(
         task_id="run_redshift_query",
         python_callable=run_query
