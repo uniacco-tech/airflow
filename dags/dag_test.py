@@ -54,7 +54,7 @@ default_args = {
 }
 
 with DAG(
-    "update_redshift_test_table",
+    "dag_test_table",
     default_args=default_args,
     schedule_interval="0 9 * * *",  # Runs daily at 9 AM IST
     catchup=False,
