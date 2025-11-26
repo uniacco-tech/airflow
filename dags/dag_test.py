@@ -62,6 +62,11 @@ with DAG(
     tags=["Redshift", "ETL"]
 ) as dag:
 
+    start = BashOperator(
+        task_id="start",
+        bash_command="echo 'Starting ETL process...'"
+    )
+    
     run_etl = PythonOperator(
         task_id="run_redshift_query",
         python_callable=run_query
