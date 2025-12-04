@@ -14,7 +14,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "/opt/airflow/dags/current/script/unischolars/"))
 
 # import your file by file name
-from us_pre_sales_adherence_report import run_query 
+from us_presales_adherence_report import run_query 
 
 default_args = {
     "owner": "nishant",
