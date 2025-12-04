@@ -32,7 +32,7 @@ with DAG(
 ) as dag:
 
     redshift_etl_task = PythonOperator(
-        task_id="BI Test",
+        task_id="BI_Test",
         python_callable=run_query
     )
 
