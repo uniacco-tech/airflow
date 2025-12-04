@@ -11,9 +11,9 @@ import sys
 import os
 
 # Add scripts folder in path
-sys.path.append(os.path.join(os.path.dirname(__file__), "/opt/airflow/dags/current/scripts/"))
+sys.path.append(os.path.join(os.path.dirname(__file__), "/opt/airflow/dags/current/scripts"))
 
-from scripts.airflow_python_test import run_query # import your file by file name
+from airflow_python_test import run_query # import your file by file name
 
 default_args = {
     "owner": "nishant",
