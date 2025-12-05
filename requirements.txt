@@ -2,3 +2,4 @@ apache-airflow-providers-celery>=3.3.0
 redis==4.6.0
 gspread==5.10.0
 gspread-dataframe==3.3.1
+pandas==2.0.3
