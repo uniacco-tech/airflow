@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
  && python -m pip install --upgrade pip setuptools wheel \
  && python -m pip install --prefer-binary --no-cache-dir -r /tmp/requirements.txt \
  && apt-get purge -y --auto-remove build-essential gfortran gcc \
- && rm -rf /var/lib/apt/lists/* /tmp/requirements.txt /root/.cache/pip
+ && rm -rf /var/lib/apt/lists/* /tmp/requirements.txt
 
 # switch back to airflow user (as original image expects)
 USER airflow
