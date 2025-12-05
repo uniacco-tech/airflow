@@ -34,7 +34,7 @@ with DAG(
 ) as dag:
 
     redshift_etl_task = PythonOperator(
-        task_id="US PreSales Adherence Report",
+        task_id="us_presales_adherence_report",
         python_callable=run_query
     )
 
