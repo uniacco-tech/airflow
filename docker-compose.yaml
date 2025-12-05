@@ -2,7 +2,7 @@ version: '3.8'
 
 # Common Airflow service config (image is taken from env or defaults to apache/airflow:2.10.2)
 x-airflow-common: &airflow-common
-  image: {AIRFLOW_IMAGE}
+  image: ${AIRFLOW_IMAGE}
   env_file:
     - .env
   environment: &airflow-common-env
