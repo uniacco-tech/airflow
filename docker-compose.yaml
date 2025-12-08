@@ -42,6 +42,10 @@ volumes:
       device: ${HOME}/airflow-persistent/logs
 
 services:
+
+  # -------------------------
+  # Redis
+  # -------------------------
   redis:
     image: redis:7.2-bookworm
     expose:
@@ -54,9 +58,12 @@ services:
       start_period: 30s
     restart: always
 
+  # -------------------------
+  # Airflow Webserver
+  # -------------------------
   airflow-webserver:
     <<: *airflow-common
-    command: webserver
+    command: ["airflow", "webserver"]
     ports:
       - "8080:8080"
     healthcheck:
@@ -71,9 +78,12 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  # -------------------------
+  # Airflow Scheduler
+  # -------------------------
   airflow-scheduler:
     <<: *airflow-common
-    command: scheduler
+    command: ["airflow", "scheduler"]
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
       interval: 30s
@@ -86,9 +96,12 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  # -------------------------
+  # Airflow Worker (Celery)
+  # -------------------------
   airflow-worker:
     <<: *airflow-common
-    command: celery worker
+    command: ["celery", "worker"]
     environment:
       <<: *airflow-common-env
       DUMB_INIT_SETSID: "0"
@@ -106,9 +119,12 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  # -------------------------
+  # Airflow Triggerer
+  # -------------------------
   airflow-triggerer:
     <<: *airflow-common
-    command: triggerer
+    command: ["airflow", "triggerer"]
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
       interval: 30s
@@ -121,6 +137,9 @@ services:
       airflow-init:
         condition: service_completed_successfully
 
+  # -------------------------
+  # Initialization Container
+  # -------------------------
   airflow-init:
     <<: *airflow-common
     user: "0:0"
@@ -145,6 +164,9 @@ services:
     volumes:
       - airflow-logs:/opt/airflow/logs
 
+  # -------------------------
+  # Airflow CLI
+  # -------------------------
   airflow-cli:
     <<: *airflow-common
     profiles:
@@ -157,9 +179,12 @@ services:
       - -c
       - airflow
 
+  # -------------------------
+  # Flower (Celery UI)
+  # -------------------------
   flower:
     <<: *airflow-common
-    command: celery flower
+    command: ["celery", "flower"]
     profiles:
       - flower
     ports:
