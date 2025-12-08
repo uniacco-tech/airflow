@@ -4,38 +4,44 @@ version: '3.8'
 x-airflow-common: &airflow-common
   image: ${AIRFLOW_IMAGE}
   environment: &airflow-common-env
-    # Executor (pull from .env)
     AIRFLOW__CORE__EXECUTOR: ${AIRFLOW__CORE__EXECUTOR}
-
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: ${DB_CONN}
     AIRFLOW__CELERY__RESULT_BACKEND: ${RESULT_BACKEND}
     AIRFLOW__CELERY__BROKER_URL: ${BROKER_URL}
-    # ----------------------------------------------------------------------
-
-    # Security keys (do NOT hardcode in YAML - set these in .env)
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
     AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
     AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: ${AIRFLOW__CORE__INTERNAL_API_SECRET_KEY}
     AIRFLOW__API__SECRET_KEY: ${AIRFLOW__API__SECRET_KEY}
-
-    # Other non-sensitive defaultables (from env if present; fallbacks provided)
     AIRFLOW__CORE__DAGS_FOLDER: ${AIRFLOW__CORE__DAGS_FOLDER}
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: ${AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION:-true}
     AIRFLOW__CORE__LOAD_EXAMPLES: ${AIRFLOW__CORE__LOAD_EXAMPLES:-true}
     AIRFLOW__CORE__ENABLE_NEW_TASK_API: ${AIRFLOW__CORE__ENABLE_NEW_TASK_API:-True}
     AIRFLOW__API__AUTH_BACKENDS: ${AIRFLOW__API__AUTH_BACKENDS:-airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session}
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+  
   volumes:
+    # Mount code from git-sync directory
     - ./dags:/opt/airflow/dags
-    - ./logs:/opt/airflow/logs
     - ./config:/opt/airflow/config
     - ./plugins:/opt/airflow/plugins
     - ./script:/opt/airflow/script
+    
+    # Mount logs OUTSIDE git-sync directory to prevent conflicts
+    - airflow-logs:/opt/airflow/logs
 
   user: "${AIRFLOW_UID:-1000}:0"
   depends_on: &airflow-common-depends-on
     redis:
       condition: service_healthy
+
+# Define the logs volume at the top level
+volumes:
+  airflow-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOME}/airflow-persistent/logs
 
 services:
   redis:
@@ -123,18 +129,19 @@ services:
     command:
       - -c
       - |
-        # initialization checks and DB migrations
         if [[ -z "${AIRFLOW_UID}" ]]; then
           echo
           echo -e "\033[1;33mWARNING!!!: AIRFLOW_UID not set!\e[0m"
           echo "If you are on Linux, set AIRFLOW_UID to avoid root-owned files."
           echo
         fi
+        
         one_meg=1048576
         mem_available=$$(($$(getconf _PHYS_PAGES) * $$(getconf PAGE_SIZE) / one_meg))
         cpus_available=$$(grep -cE 'cpu[0-9]+' /proc/stat)
         disk_available=$$(df / | tail -1 | awk '{print $$4}')
         warning_resources="false"
+        
         if (( mem_available < 4000 )) ; then
           echo
           echo -e "\033[1;33mWARNING!!!: Not enough memory available for Docker.\e[0m"
@@ -162,8 +169,11 @@ services:
           echo "See: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
           echo
         fi
-        mkdir -p /sources/logs /sources/dags /sources/plugins /sources/config
-        chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins,config}
+        
+        # Create directories - logs is now in persistent volume
+        mkdir -p /opt/airflow/logs /sources/dags /sources/plugins /sources/config
+        chown -R "${AIRFLOW_UID}:0" /opt/airflow/logs /sources/{dags,plugins,config}
+        
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env
@@ -174,6 +184,8 @@ services:
     user: "0:0"
     volumes:
       - ${AIRFLOW_PROJ_DIR:-.}:/sources
+      # Also mount persistent logs for init
+      - airflow-logs:/opt/airflow/logs
 
   airflow-cli:
     <<: *airflow-common
