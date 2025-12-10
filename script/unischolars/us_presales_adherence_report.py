@@ -92,7 +92,7 @@ def run_query():
              'https://www.googleapis.com/auth/drive']
     
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        '/opt/airflow/dags/current/credentials/credential.json', scope
+        '/opt/airflow/script/credential.json', scope
     )
     gc = gspread.authorize(credentials)
 
