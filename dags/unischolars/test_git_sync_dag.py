@@ -4,7 +4,7 @@ from airflow.operators.python import PythonOperator
 
 
 def print_hello():
-    print("🔥 Git-sync test DAG loaded successfully! If you're seeing this, your setup works.")
+    print("🔥 DAG updated — git-sync live reload works!")
 
 
 with DAG(
