@@ -22,5 +22,23 @@ RUN --mount=type=cache,target=/root/.cache/pip \
  && apt-get purge -y --auto-remove build-essential gfortran gcc \
  && rm -rf /var/lib/apt/lists/* /tmp/requirements.txt
 
+ # -------------------------------------------------------
+# Add this block to handle Base64-decoded credentials
+# -------------------------------------------------------
+
+# Create directory for credentials
+RUN mkdir -p /opt/airflow/secrets \
+    && chown airflow:airflow /opt/airflow/secrets
+
+# Accept the Base64 secret at build time
+ARG GCP_CREDENTIAL_BASE64=""
+
+# Decode the Base64 into credential.json
+# Note the use of bash -lc so the variable resolves
+RUN bash -lc 'if [ -n "$GCP_CREDENTIAL_BASE64" ]; then \
+      echo "$GCP_CREDENTIAL_BASE64" | base64 -d > /opt/airflow/secrets/credential.json; \
+    fi' \
+    && chown airflow:airflow /opt/airflow/secrets/credential.json
+
 # switch back to airflow user (as original image expects)
 USER airflow
