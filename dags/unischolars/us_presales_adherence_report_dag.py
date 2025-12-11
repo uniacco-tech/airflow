@@ -29,6 +29,7 @@ with DAG(
     description="Pre Sales Adherence report of Pre Sales team",
     schedule_interval="*/5 * * * *",  # time update (change as needed)
     start_date=datetime(2025, 12, 4),
+    max_active_runs=1,
     catchup=False,
     tags=["UniScholars", "Report","Email"]
 ) as dag:
