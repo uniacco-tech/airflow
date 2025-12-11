@@ -11,7 +11,7 @@ import sys
 import os
 
 # Add scripts folder in path
-sys.path.append('/opt/airflow/script/unischolars')
+sys.path.append('/git/current/script/unischolars')
 
 # import your file by file name
 from us_presales_adherence_report import run_query 
