@@ -91,15 +91,11 @@ def run_query():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
     
-    credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        '/home/ubuntu/airflow/secrets/credential.json', scope
-    )
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('/opt/airflow/secrets/credential.json', scope)
     gc = gspread.authorize(credentials)
 
     try:
-        ws1 = gc.open_by_url(
-            "https://docs.google.com/spreadsheets/d/1b4_DGN1DlSEclc-P9guyZOT-2ZQIUC_qO3VR-fP4klc/edit?usp=sharing"
-        ).worksheet("Dump")
+        ws1 = gc.open_by_url("https://docs.google.com/spreadsheets/d/1b4_DGN1DlSEclc-P9guyZOT-2ZQIUC_qO3VR-fP4klc/edit?usp=sharing").worksheet("Dump")
 
         gd.set_with_dataframe(ws1, df, row=1, col=1)
         logging.info("Data dumped to Google Sheet successfully")
