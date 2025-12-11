@@ -173,3 +173,9 @@ pip-wheel-metadata
 # Dev files
 /dev/packages.txt
 /dev/Dockerfile.pmc
+# Prevent secrets from ever reaching Git
+secrets/
+credentials/
+*.json
+*.env
+*.pem
