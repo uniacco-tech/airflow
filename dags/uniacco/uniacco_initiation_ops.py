@@ -29,7 +29,7 @@ with DAG(
 
     inventory_report_task = PythonOperator(
         task_id="uniacco_initiation_ops", 
-        python_callable=run_inventory_report_etl
+        python_callable=final_fun
     )
 
     inventory_report_task
