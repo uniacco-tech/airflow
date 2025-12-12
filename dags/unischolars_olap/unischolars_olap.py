@@ -27,7 +27,7 @@ with DAG(
     catchup=False,
     start_date=datetime(2025, 12, 12),
     max_active_runs=1,
-    tags=["unicreds", "etl", "standard"],
+    tags=["UniScholars", "Table", "ETL"],
 ) as dag:
 
     # --- Task 1: Run unischolars_standard.py ---
