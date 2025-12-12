@@ -27,7 +27,7 @@ with DAG(
     dag_id="us_pre_sales_adherence_report",
     default_args=default_args,
     description="Pre Sales Adherence report of Pre Sales team",
-    schedule_interval="*/5 * * * *",  # time update (change as needed)
+    schedule_interval="55 4 * * *",  # time update (change as needed)
     start_date=datetime(2025, 12, 4),
     max_active_runs=1,
     catchup=False,
