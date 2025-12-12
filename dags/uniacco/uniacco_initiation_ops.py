@@ -20,7 +20,7 @@ with DAG(
     dag_id="uniacco_initiation_ops", 
     default_args=default_args,
     description="Updating UniAcco Booking Initiation Dump",
-    schedule_interval="*/15 * * * *",
+    schedule_interval="*/10 * * * *",
     start_date=datetime(2025, 12, 12),
     max_active_runs=1,
     catchup=False,
