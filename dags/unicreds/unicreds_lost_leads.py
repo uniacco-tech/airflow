@@ -7,7 +7,7 @@ import os
 SCRIPTS_PATH = '/git/current/script/unischolars'
 sys.path.append(SCRIPTS_PATH)
 
-from uc_lost_lead_dump_report import run_lost_lead_dump_etl
+from uc_lost_leads import run_lost_lead_dump_etl
 
 default_args = {
     "owner": "nishant",
