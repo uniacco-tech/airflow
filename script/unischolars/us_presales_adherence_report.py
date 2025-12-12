@@ -401,12 +401,9 @@ def run_query():
 
     # ---------------- SEND FINAL METRICS EMAIL ----------------
     subject = f"UniScholars Lead Basic Metrics - {formatted_date}"
-    recipient_emails = ['nishant.sharma@uniacco.com']
-#     recipient_emails = ['aman.rohada@uniacco.com','prem@uniacco.com','abhishek@uniacco.com','data@uniacco.com',
-#         'harpritsingh.bhamara@unischolars.com','performance@uniacco.com',
-#         'anupam.gupta@uniacco.com','sara.solkar@unischolars.com',
-#         'shreeya.dalvi@unischolars.com','shubham.pardeshi@unischolars.com',
-#         'anaa.shaikh@unischolarz.com','saurab.rao@unischolars.com']
+    recipient_emails = ['prem@uniacco.com','abhishek@uniacco.com','data@uniacco.com',
+        'harpritsingh.bhamara@unischolars.com','performance@uniacco.com','anupam.gupta@uniacco.com','sara.solkar@unischolars.com',
+        'shreeya.dalvi@unischolars.com','shubham.pardeshi@unischolars.com','anaa.shaikh@unischolarz.com','saurab.rao@unischolars.com']
 
     try:
         send_email(subject, body, recipient_emails)
