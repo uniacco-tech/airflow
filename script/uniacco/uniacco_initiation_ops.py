@@ -132,7 +132,7 @@ def update_google_sheet(gc, df):
         logger.error(f"Failed to update Google Sheet: {e}")
         raise
 
-def run_inventory_report_etl():
+def final_fun():
     """
     Main function to run the entire ETL process for the inventory report.
     This function will be called by the Airflow PythonOperator.
