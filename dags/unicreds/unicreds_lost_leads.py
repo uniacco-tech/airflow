@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import sys
 import os
 
-SCRIPTS_PATH = '/git/current/script/unischolars'
+SCRIPTS_PATH = '/git/current/script/unicreds'
 sys.path.append(SCRIPTS_PATH)
 
 from unicreds_lost_leads import run_lost_lead_dump_etl
