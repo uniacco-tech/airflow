@@ -13,8 +13,6 @@ REDSHIFT_PORT = int(os.environ.get("REDSHIFT_PORT", 5439))
 REDSHIFT_USER = os.environ.get("REDSHIFT_USER", "nishant")
 REDSHIFT_PASSWORD = os.environ.get("REDSHIFT_PASSWORD", "dw620LFVkx1Y")
 
-credentials = ServiceAccountCredentials.from_json_keyfile_name('/opt/airflow/secrets/credential.json', scope)
-
 REPORT_SHEET_URL = "https://docs.google.com/spreadsheets/d/1MgWqSyOzwINVopojSi9lJX7IlpgAsNU3zLIZ-Y2jWSA/edit?usp=sharing"
 REPORT_WORKSHEET_NAME = "Dump"
 
@@ -47,7 +45,7 @@ def get_google_sheet_client():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
     try:
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(GSPREAD_CREDENTIALS_PATH, scope)
+        credentials = ServiceAccountCredentials.from_json_keyfile_name('/opt/airflow/secrets/credential.json', scope)
         gc = gspread.authorize(credentials)
         logger.info("Google Sheet client authorized successfully.")
         return gc
