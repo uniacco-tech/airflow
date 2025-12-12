@@ -8,7 +8,7 @@ import sys
 # Define the directory where your Python files are located
 # IMPORTANT: Replace this with the actual path on your Airflow worker machine.
 # If the files are in the same directory as the DAG, you can often omit this.
-SCRIPT_DIR = '/path/to/your/unischolars/scripts/' 
+SCRIPT_DIR = '/git/current/script/unischolars_olap' 
 
 default_args = {
     "owner": "airflow",
