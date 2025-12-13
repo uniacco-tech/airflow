@@ -113,7 +113,7 @@ def execute_query_and_prepare_df(conn, query, conversion_name):
         r'(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})', r'\1T\2', regex=True
     ).str.replace(r' Asia/Calcutta', 'Z') # Google Ads uses ISO format, replacing T with Z is common practice for simple conversion
     
-    df = df.drop(columns=['Conversion Time 1'])
+    #df = df.drop(columns=['Conversion Time 1'])
     df.columns = ['Email', 'Phone Number', 'Conversion Name', 'Conversion Time']
     
     return df
