@@ -20,6 +20,8 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "aman.rohada@uniacco.com")
 SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "dmrtiyrbpqoaeweg")
 
+RECIPIENT_EMAILS = ['nishant.sharma@uniacco.com']
+
 RECIPIENT_EMAILS = [
     'anupam.gupta@uniacco.com', 'data@uniacco.com', 'pratibha.singh@unischolars.com', 
     'rajesh.velamarthi@unischolars.com', 'roopali.birman@unischolars.com', 
